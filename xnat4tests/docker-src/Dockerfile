@@ -44,11 +44,6 @@ RUN mkdir -p \
         ${XNAT_ROOT}/prearchive
 RUN /usr/local/bin/make-xnat-config.sh
 RUN rm /usr/local/bin/make-xnat-config.sh
-RUN mkdir -p /var/log/tomcat
-ENV XNAT_HOME=${XNAT_HOME} XNAT_DATASOURCE_USERNAME=${XNAT_DATASOURCE_USERNAME} PGPASSWORD=${XNAT_DATASOURCE_PASSWORD}
-ENV CATALINA_OPTS="-Xms${JAVA_MS} -Xmx${JAVA_MX} -Dxnat.home=${XNAT_HOME}"
-
-## XNAT and plugins
 WORKDIR /tmp
 RUN curl -fSL -o xnat.war \
     "https://api.bitbucket.org/2.0/repositories/xnatdev/xnat-web/downloads/xnat-web-${XNAT_VERSION}.war" \
@@ -60,6 +55,9 @@ RUN curl -fSL -o xnat.war \
     && curl -fSL -o ${XNAT_HOME}/plugins/ohif-viewer.jar \
     "https://www.xnat.org/files/ohif-viewer-xnat-plugin/ohif-viewer-${XNAT_OHIF_VIEWER_VERSION}.jar" \
     && rm -rf /tmp/*
+RUN mkdir -p /var/log/tomcat
+ENV XNAT_HOME=${XNAT_HOME} XNAT_DATASOURCE_USERNAME=${XNAT_DATASOURCE_USERNAME} PGPASSWORD=${XNAT_DATASOURCE_PASSWORD}
+ENV CATALINA_OPTS="-Xms${JAVA_MS} -Xmx${JAVA_MX} -Dxnat.home=${XNAT_HOME}"
 
 # Add scripts for configuring XNAT database before launching Tomcat
 COPY launch-xnat.sh /launch-xnat.sh
